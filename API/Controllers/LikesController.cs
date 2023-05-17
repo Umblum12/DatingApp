@@ -11,12 +11,12 @@ namespace API.Controllers
     {
         private readonly IUserRepository _userRepository;
         private readonly ILikesRepository _likesRepository;
-      public LikesController(IUserRepository userRepository, ILikesRepository likesRepository)
-      {
+        public LikesController(IUserRepository userRepository, ILikesRepository likesRepository)
+        {
             _likesRepository = likesRepository;
             _userRepository = userRepository;
-      }
-[HttpPost("{username}")]
+        }
+        [HttpPost("{username}")]
         public async Task<ActionResult> AddLike(string username)
         {
             var sourceUserId = User.GetUserId();
@@ -45,13 +45,13 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<PagedList<LikeDto>>> GetUserLikes([FromQuery]LikesParams likesParams)
+        public async Task<ActionResult<PagedList<LikeDto>>> GetUserLikes([FromQuery] LikesParams likesParams)
         {
             likesParams.UserId = User.GetUserId();
 
             var users = await _likesRepository.GetUserLikes(likesParams);
 
-            Response.AddPaginationHeader(new PaginationHeader(users.CurrentPage, 
+            Response.AddPaginationHeader(new PaginationHeader(users.CurrentPage,
                 users.PageSize, users.TotalCount, users.TotalPages));
 
             return Ok(users);
