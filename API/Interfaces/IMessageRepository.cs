@@ -1,5 +1,8 @@
+using System.Text.RegularExpressions;
 using API.DTOs;
+using API.Entities;
 using API.Helpers;
+using Group = API.Entities.Group;
 
 namespace API.Interfaces
 {
@@ -11,5 +14,10 @@ namespace API.Interfaces
         Task<PagedList<MessageDto>> GetMessageForUser(MessageParams messageParams);
         Task<IEnumerable<MessageDto>> GetMessageThread(string currentUserName, string recipientUserName); 
         Task<bool> SaveAllAsync();
+        void AddGroup(Group group);
+        void RemoveConnection(Connection connection);
+        Task<Connection> GetConnection(string connectionId);
+        Task<Group> GetMessageGroup(string groupName);
+        Task<Group> GetGroupForConnection(string connectionId);
     }
 }
