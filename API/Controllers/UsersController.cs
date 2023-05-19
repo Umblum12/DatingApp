@@ -40,7 +40,9 @@ namespace API.Controllers
         [HttpGet("{username}")]
         public async Task<ActionResult<MemberDto>> GetUser(string username)
         {
-            return await _uow.UserRepository.GetMembersAsync(username);
+            var currentUsername = User.GetUsername();
+            return await _uow.UserRepository.GetMemberAsync(username, isCurrentUser: currentUsername == username
+            );
         }
 
         [HttpPut]
@@ -56,8 +58,8 @@ namespace API.Controllers
         [HttpPost("add-photo")]
         public async Task<ActionResult<PhotoDto>> AddPhoto(IFormFile file)
         {
-            var user = await _uow.UserRepository.GetUserByUsernameAsync(User.GetUsername());
-            if (user == null) return NotFound();
+            var user = await
+           _uow.UserRepository.GetUserByUsernameAsync(User.GetUsername());
             var result = await _photoService.AddPhotoAsync(file);
             if (result.Error != null) return BadRequest(result.Error.Message);
             var photo = new Photo
@@ -65,14 +67,16 @@ namespace API.Controllers
                 Url = result.SecureUrl.AbsoluteUri,
                 PublicId = result.PublicId
             };
-            if (user.Photos.Count == 0) photo.IsMain = true;
             user.Photos.Add(photo);
             if (await _uow.Complete())
             {
-                return CreatedAtAction(nameof(GetUser),
-                 new { user.UserName }, _mapper.Map<PhotoDto>(photo));
+                return CreatedAtRoute("GetUser", new
+                {
+                    username =
+               user.UserName
+                }, _mapper.Map<PhotoDto>(photo));
             }
-            return BadRequest("Problem adding photo");
+            return BadRequest("Problem addding photo");
         }
 
         [HttpPut("set-main-photo/{photoId}")]
@@ -92,8 +96,9 @@ namespace API.Controllers
         [HttpDelete("delete-photo/{photoId}")]
         public async Task<ActionResult> DeletePhoto(int photoId)
         {
-            var user = await _uow.UserRepository.GetUserByUsernameAsync(User.GetUsername());
-            var photo = user.Photos.FirstOrDefault(x => x.Id == photoId);
+            var user = await
+           _uow.UserRepository.GetUserByUsernameAsync(User.GetUsername());
+            var photo = await _uow.PhotoRepository.GetPhotoById(photoId);
             if (photo == null) return NotFound();
             if (photo.IsMain) return BadRequest("You cannot delete your main photo");
             if (photo.PublicId != null)

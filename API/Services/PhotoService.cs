@@ -24,7 +24,6 @@ namespace API.Services
         public async Task<ImageUploadResult> AddPhotoAsync(IFormFile file)
         {
             var uploadResult = new ImageUploadResult();
-
             if (file.Length > 0)
             {
                 using var stream = file.OpenReadStream();
@@ -36,7 +35,6 @@ namespace API.Services
                 };
                 uploadResult = await _cloudinary.UploadAsync(uploadParams);
             }
-
             return uploadResult;
         }
 

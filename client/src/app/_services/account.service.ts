@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { User } from '../_models/user';
 import { BehaviorSubject, map } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { User } from '../_models/user';
 import { PresenceService } from './presence.service';
 
 @Injectable({
@@ -13,10 +13,7 @@ export class AccountService {
   private currentUserSource = new BehaviorSubject<User | null>(null);
   currentUser$ = this.currentUserSource.asObservable();
 
-  constructor(
-    private http: HttpClient,
-    private presenceService: PresenceService
-    ) { }
+  constructor(private http: HttpClient, private presenceService: PresenceService) { }
 
   login(model: any) {
     return this.http.post<User>(this.baseUrl + 'account/login', model).pipe(
@@ -37,7 +34,7 @@ export class AccountService {
         }
       })
     )
-  }
+  } 
 
   setCurrentUser(user: User) {
     user.roles = [];
